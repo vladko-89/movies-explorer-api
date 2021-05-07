@@ -56,9 +56,9 @@ module.exports.deleteMovieByID = (req, res, next) => {
       } else if (!movie.owner.equals(req.user._id)) {
         throw new ForbiddenError('Доступ ограничен! Нельзя удалять чужие фильмы!');
       } else {
-        Movie.findByIdAndRemove(req.params.id)
+        return movie.remove()
           // eslint-disable-next-line no-shadow
-          .then((movie) => {
+          .then(() => {
             res.send(movie);
           });
       }

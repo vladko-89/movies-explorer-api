@@ -12,10 +12,9 @@ const router = require('./routes');
 const { errorHandler } = require('./midlewares/error-handler');
 const { requestLogger, errorLogger } = require('./midlewares/logger');
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3000, MONGO_URL = 'mongodb://localhost:27017/bitfilmsdb' } = process.env;
 
 app.use(cors());
-app.use(helmet());
 
 app.set('trust proxy', 1);
 
@@ -23,12 +22,8 @@ const limiter = rateLimit({
   windowsMs: 15 * 60 * 1000,
   max: 90,
 });
-app.use(limiter);
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
+mongoose.connect(MONGO_URL, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
@@ -37,7 +32,10 @@ mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
 });
 
 app.use(requestLogger);
-
+app.use(limiter);
+app.use(helmet());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(router);
 
 app.use(errorLogger);
